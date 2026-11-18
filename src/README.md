@@ -30,7 +30,31 @@ Uma aplicação FastAPI super simples que permite aos estudantes visualizar e se
 | Método | Endpoint                                                          | Descrição                                                           |
 | ------ | ----------------------------------------------------------------- | ------------------------------------------------------------------- |
 | GET    | `/activities`                                                     | Obter todas as atividades com seus detalhes e contagem atual de participantes |
-| POST   | `/activities/{activity_name}/signup?email=student@mergington.edu` | Inscrever-se em uma atividade                                       |
+| POST   | `/auth/login`                                                     | Iniciar sessão de professor com nome de usuário e senha             |
+| POST   | `/auth/logout`                                                    | Encerrar a sessão de professor                                      |
+| GET    | `/auth/me`                                                        | Consultar a sessão atual                                            |
+| POST   | `/activities/{activity_name}/signup?email=student@mergington.edu` | Inscrever estudante (requer sessão de professor)                   |
+| DELETE | `/activities/{activity_name}/unregister?email=student@mergington.edu` | Remover inscrição (requer sessão de professor)                  |
+
+### Configuração do acesso de professores
+
+Crie um hash de senha sem armazenar a senha em texto puro:
+
+```sh
+.venv/bin/python -c "from src.app import hash_password; print(hash_password(input('Senha do professor: ')))"
+```
+
+Crie `src/teachers.json` com o nome de usuário e o hash gerado:
+
+```json
+{
+  "teachers": {
+    "professor": "pbkdf2_sha256$310000$<salt>$<hash>"
+  }
+}
+```
+
+O arquivo local de credenciais é ignorado pelo Git. É possível definir outro caminho com `TEACHER_CREDENTIALS_FILE`. Para manter as sessões válidas após reiniciar o servidor, configure `SESSION_SECRET` com um segredo aleatório e persistente. Em produção com HTTPS, defina também `SESSION_COOKIE_SECURE=true`.
 
 ## Modelo de Dados
 
